@@ -23,10 +23,31 @@ $(document).ready(function(){
     $("#addRow").click(function(){
       $('#modal-content').modal('show')
     });
+    $('#objectIds').on('change', function() {
+      // alert( this.value );
+      app.getObject('QSPreview',this.value);
+    })
+    $('#select-next').click(function() {
+      var nextElement = $('#objectIds > option:selected').next('option');
+    if (nextElement.length > 0) {
+        $('#objectIds > option:selected').removeAttr('selected').next('option').attr('selected', 'selected');
+        app.getObject('QSPreview',$( "#objectIds" ).val());
+      }
+    });
+
+    $('#select-prev').click(function() {
+      var prevElement = $('#objectIds > option:selected').prev('option');
+      console.log("my object: %o", prevElement)
+    if (prevElement.length > 0) {
+        $('#objectIds > option:selected').removeAttr('selected').prev('option').attr('selected', 'selected');
+        app.getObject('QSPreview',$( "#objectIds" ).val());
+      }
+    });
+
     $("#insertId").click(function(){
       var qsid = $('#objectIds').val();
       var html = '<div class="col-sm-4">';
-      html += '<div id="QV'+i+'">QS'+i+'</div>';
+      html += '<div id="QV'+i+'" class="qs-box">QS'+i+'</div>';
       html += '<button type="button" class="btn btn-info btn-sm zoombtn" data-toggle="modal" data-target="#modal-zoom">zoom</button>';
       html += '<button type="button" class="btn btn-info btn-sm removebtn" >x</button>';
       html += '</div>';
