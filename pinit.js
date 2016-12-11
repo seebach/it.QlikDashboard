@@ -19,9 +19,17 @@ $(document).ready(function(){
 
   require( ["js/qlik"], function ( qlik ) {
 
-    var i=4;
+    function createDiv (id) {
+      var html = '<div class="col-xs-6 col-sm-4 col-lg-3">';
+      html += '<div id="QV'+id+'" class="qs-box">QS'+id+'</div>';
+      html += '<button type="button" class="btn btn-info btn-sm zoombtn" data-toggle="modal" data-target="#modal-zoom">zoom</button>';
+      html += '<button type="button" class="btn btn-info btn-sm removebtn" >x</button>';
+      html += '</div>';
+      return html;
+    }
+    var i=0;
     $("#addRow").click(function(){
-      $('#modal-content').modal('show')
+      $('#modal-select').modal('show')
     });
     $('#objectIds').on('change', function() {
       // alert( this.value );
@@ -46,16 +54,15 @@ $(document).ready(function(){
 
     $("#insertId").click(function(){
       var qsid = $('#objectIds').val();
-      var html = '<div class="col-sm-4">';
-      html += '<div id="QV'+i+'" class="qs-box">QS'+i+'</div>';
-      html += '<button type="button" class="btn btn-info btn-sm zoombtn" data-toggle="modal" data-target="#modal-zoom">zoom</button>';
-      html += '<button type="button" class="btn btn-info btn-sm removebtn" >x</button>';
-      html += '</div>';
+      i++;
+      // add to array
+      selectedIds[i] =  qsid;
+      alert(selectedIds);
+      var html = createDiv(i);
 
       $('#last').before(html);
       qs = 'QV'+i;
       app.getObject(qs,qsid);
-      i++;
 
     });
 
@@ -63,21 +70,33 @@ $(document).ready(function(){
       $(this).parent().remove();
     });
 
-    $('.zoombtn').click(function() {
-      //alert($(this).prev().attr('id'))
-      //app.getObject('QSZOOM','RBJkQ');
-      var $QSZOOM = $(this).prev().clone();
-      $('#QSZOOM').html($QSZOOM);
+    $(document).on('click', ".zoombtn", function() {
+      $('#QSZOOM').empty();
+//    $(this).prev().clone().appendTo('#QSZOOM');
 
-//    alert("Hello");
+      var id = $(this).prev().attr('id').replace("QV","");
+
+//      var $QSZOOM = $(this).prev().clone();
+      app.getObject('QSZOOM',selectedIds[id-1]);
+//      $('#QSZOOM').html($QSZOOM);
     });
 
     var app = qlik.openApp('8c01277a-aae5-4f9c-94c7-b02de896fe7e', config);
 
+    // get list of id's
+    var selectedIds = ['ewhnvM','kjzhVu','RBJkQ'] ;
+
+    for (id in selectedIds) {
+      i++;
+      var html = createDiv(i);
+      $('#last').before(html);
+      app.getObject('QV'+i,selectedIds[id]);
+    }
+
     //  app.getObject('QV04','admCvFH');
-    app.getObject('QV1','ewhnvM');
-    app.getObject('QV2','kjzhVu');
-    app.getObject('QV3','RBJkQ');
+    //app.getObject('QV1','ewhnvM');
+    //app.getObject('QV2','kjzhVu');
+    //app.getObject('QV3','RBJkQ');
 
     app.getAppObjectList( 'sheet', function(reply){
     	//var qlikObjects = [];
