@@ -92,6 +92,7 @@ $(document).ready(function(){
       $('#last').before(html);
       app.getObject('QV'+i,selectedIds[id]);
     }
+
     //  app.getObject('QV04','admCvFH');
     //app.getObject('QV1','ewhnvM');
     //app.getObject('QV2','kjzhVu');
@@ -105,7 +106,11 @@ $(document).ready(function(){
         //str += 't:'+ value.qData.title + ' ';
     		$.each(value.qData.cells, function(k,v){
     	//		str +=  v.type+' '+v.name + ' ';
+        //  qlikObjects.push({"type": v.type, "name":v.name})
             app.getObjectProperties(v.name).then(function(model){
+              var title = model.properties.title;
+              title = Boolean(title) === false ?  'No Title':title;
+              $('#objectIds').append( $('<option></option>').val(v.name).html(v.type+" id: "+title) )
             });
 
     		});
