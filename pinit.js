@@ -25,7 +25,6 @@ $(document).ready(function(){
     $("#addRow").click(function(){
       $('#modal-content').modal('show');
       $("#objectIds").trigger("change");
-
     });
 /*    $('#objectIds').on('change', function() {
       //console.log('Change to ' + this.value);
@@ -94,6 +93,7 @@ $(document).ready(function(){
       }));
 
       // reset the selections array
+      $('#QSPreview').empty();
       selection = [];
     });
 
@@ -188,38 +188,18 @@ $(document).ready(function(){
     DBitems.push({'qs':'QV2','guid':'jUbp'});
     DBitems.push({'qs':'QV3', 'guid':'dgXswmw'});
 
-
+    // keep all object in app here
     var SheetObjects=[];
     app.getAppObjectList( 'sheet', function(reply){
-    //console.log(reply);
-    //SheetObjectIds
-    var sheetTitle = '';
-    var sheetGuid = '';
-    var sheetTitlePrev = '';
-    $.each(reply.qAppObjectList.qItems, function(key, value) {
-      //console.log(value);
-      sheetTitle = value.qMeta.title;
-      sheetGuid = value.qInfo.qId;
-
-    // loop sheets
-    	$.each(value.qData.cells, function(k,v){
-//R        console.log(v);
-          if ('type' in v ) {
-        SheetObjects.push({'sheet': sheetTitle,'sheetGuid':sheetGuid,'guid':v.name,'type':v.type});
-        //if(sheetTitle !== sheetTitlePrev){
-           // $('#objectIds').append( $('<optgroup></optgroup>').prop('label', sheetTitle)); // Breaks Next-Prev
-           if(sheetTitle.indexOf('Chart')!= -1) {
-              $("#Sheets").append($('<option></option>').val(sheetTitle).attr('data-sheet-guid',sheetGuid).html(sheetTitle));
-           }
+    $.each(reply.qAppObjectList.qItems, function(key, sheet) {
+      $("#Sheets").append($('<option></option>').val(sheet.qMeta.title).attr('data-sheet-guid',sheet.qInfo.qId).html(sheet.qMeta.title));
+    	$.each(sheet.qData.cells, function(index,value){
+          if ('type' in value   ) {
+        SheetObjects.push({'sheet': sheet.qMeta.title,'sheetGuid':sheet.qInfo.qId,'guid':value.name,'type':value.type});
           }
-/*          if(v.type != "text-image") {
-            $('#objectIds').append( $('<option></option>').val(v.name).html(v.type+" id: "+v.name) );
-          } */
-          sheetTitlePrev = sheetTitle;
     		});
     	});
     });
-    //console.log('O %o', SheetObjects);
   } );
 
 });
