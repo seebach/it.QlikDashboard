@@ -76,21 +76,25 @@ $(document).ready(function(){
     });
 
     $("#insertId").click(function(){
-      var qsid = $('#SheetObjectIds').val();
-//      var qsid = $('#objectIds').val();
-      var html = '<div class="col-sm-4">';
-      html += '<div id="QV'+i+'" class="qs-box">QS'+i+'</div>';
-      html += '<button type="button" class="btn btn-info btn-sm zoombtn" data-toggle="modal" data-target="#modal-zoom">zoom</button>';
-      html += '<button type="button" class="btn btn-info btn-sm removebtn" >x</button>';
-      html += '</div>';
+      $.each(selection, (function (index, value) {
+        var qsid = value;
+  //      var qsid = $('#objectIds').val();
+        var html = '<div class="col-sm-4">';
+        html += '<div id="QV'+i+'" class="qs-box">QS'+i+'</div>';
+        html += '<button type="button" class="btn btn-info btn-sm zoombtn" data-toggle="modal" data-target="#modal-zoom">zoom</button>';
+        html += '<button type="button" class="btn btn-info btn-sm removebtn" >x</button>';
+        html += '</div>';
 
-      $('#last').before(html);
-      qs = 'QV'+i;
-      app.getObject(qs,qsid);
-      DBitems.push({'qs': qs, 'guid': qsid});
-      //console.log(DBitems);
-      i++;
+        $('#last').before(html);
+        qs = 'QV'+i;
+        app.getObject(qs,qsid);
+        DBitems.push({'qs': qs, 'guid': qsid});
+        //console.log(DBitems);
+        i++;
+      }));
 
+      // reset the selections array
+      selection = [];
     });
 
     $(document).on('click', ".removebtn", function() {
@@ -105,25 +109,57 @@ $(document).ready(function(){
       //console.log(DBitems);
     });
 
+    // array for selected guid
+    var selection = [];
     $(document).on('change', "#Sheets", function(){
       // Clear select first...
+      $('#QSPreview').empty();
+      //var html = '<div class="col-sm-4">';
       $('#SheetObjectIds option').remove();
       //console.log(this.value);
-      if(this.value != 'null') {
-        for (var i = SheetObjects.length - 1; i >= 0; i--) {
-          if(SheetObjects[i].sheet == this.value) {
-            var v = SheetObjects[i];
-            //console.log(v);
-
-            app.getObjectProperties(v.guid).then(function(model){
-              var title = model.properties.title;
-              title = Boolean(title) === false ?  'No Title':title;
-              $('#SheetObjectIds').append( $('<option></option>').val(v.guid).html(v.type+" id: "+title) );
-            });
+//      if(this.value != 'null') {
+        /* replace with foreach later */
+///----
+      console.log($( "#Sheets option:selected" ).data("sheetGuid")) ;
+      var sheetGuid = $( "#Sheets option:selected" ).data("sheetGuid");
+      var i = 0;
+      app.getObjectProperties(sheetGuid).then(function(model){
+	       console.log(model);
+       });
+       for (var prop in SheetObjects) {
+         if(SheetObjects[prop].sheetGuid==sheetGuid) {
+          var guid = SheetObjects[prop].guid;
+         console.log(i+' : '+guid);
+         // Add new row for earch 3 eleemnt
+          if(i==0 || (i/4) % 1 == 0) { //modlues 1 is zero for whole numbers
+            var divId = 'QSPreview-'+i;
+            $('#QSPreview').append('<div class="row align-items-start" id="'+divId+'"></div>');
           }
-        }
-      }
+          $('#'+divId).append('<div class="col-sm-3 panel" ><span id="select-'+guid+'" class="selectedIcon" >aa</span><div id="preview-'+guid+'" ></div></div>');
+          app.getObject('preview-'+guid,guid,{"noInteraction": true,"noSelections": true});
+          $( "#preview-"+guid ).click(function() {
+            selectObeject ($(this).attr('id').replace('preview-',''))
+          });
+          $( "#select-"+guid ).click(function() {
+              selectObeject ($(this).attr('id').replace('select-',''))
+          });
+          i++;
+        }  }
+      ;
     });
+
+    function selectObeject (addGuid) {
+      var index = selection.indexOf(addGuid);
+      // check if value exists then add or remove it
+      if (index > -1) {
+        selection.splice(index, 1);
+      } else {
+        selection.push(addGuid);
+      }
+      $("#select-"+addGuid).toggle();
+      console.log(selection);
+    }
+
 
     $(document).on('click', ".zoombtn", function(){
        // console.log($(this).parent()[0].children[0].id);
@@ -158,18 +194,22 @@ $(document).ready(function(){
     //console.log(reply);
     //SheetObjectIds
     var sheetTitle = '';
+    var sheetGuid = '';
     var sheetTitlePrev = '';
     $.each(reply.qAppObjectList.qItems, function(key, value) {
       //console.log(value);
       sheetTitle = value.qMeta.title;
+      sheetGuid = value.qInfo.qId;
+
+    // loop sheets
     	$.each(value.qData.cells, function(k,v){
-        //console.log(v);
-        SheetObjects.push({'sheet': sheetTitle, 'guid': v.name, 'type': v.type});
-        if(sheetTitle !== sheetTitlePrev)
-          {
+//R        console.log(v);
+          if ('type' in v ) {
+        SheetObjects.push({'sheet': sheetTitle,'sheetGuid':sheetGuid,'guid':v.name,'type':v.type});
+        //if(sheetTitle !== sheetTitlePrev){
            // $('#objectIds').append( $('<optgroup></optgroup>').prop('label', sheetTitle)); // Breaks Next-Prev
            if(sheetTitle.indexOf('Chart')!= -1) {
-              $("#Sheets").append($('<option></option>').val(sheetTitle).html(sheetTitle));
+              $("#Sheets").append($('<option></option>').val(sheetTitle).attr('data-sheet-guid',sheetGuid).html(sheetTitle));
            }
           }
 /*          if(v.type != "text-image") {
