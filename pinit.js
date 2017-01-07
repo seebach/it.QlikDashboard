@@ -37,43 +37,6 @@ $(document).ready(function(){
     })
 
 
-    $('#select-next').click(function() {
-      var currentElement = $('#SheetObjectIds > option:selected');
-      var nextElement = $('#SheetObjectIds > option:selected').next('option');
-//      var currentElement = $('#objectIds > option:selected');
-//      var nextElement = $('#objectIds > option:selected').next('option');
-      //console.log("Next: %o", nextElement);
-
-    if (nextElement.length > 0) {
-        // No items so no more navigation
-      } else {
-        nextElement = currentElement;
-      }
-      document.getElementById("SheetObjectIds").value = nextElement.val();
-      $("#SheetObjectIds").trigger("change");
-//      document.getElementById("objectIds").value = nextElement.val();
-//      $("#objectIds").trigger("change");
-
-    });
-
-    $('#select-prev').click(function() {
-      var currentElement = $('#SheetObjectIds > option:selected');
-      var prevElement = $('#SheetObjectIds > option:selected').prev('option');
-//      var currentElement = $('#objectIds > option:selected');
-//      var prevElement = $('#objectIds > option:selected').prev('option');
-
-      //console.log("Prev: %o", prevElement)
-    if (prevElement.length > 0) {
-        // No items so no more navigation
-      }  else {
-        prevElement= currentElement;
-      }
-      document.getElementById("SheetObjectIds").value = prevElement.val();
-      $("#SheetObjectIds").trigger("change");
-//      document.getElementById("objectIds").value = prevElement.val();
-//      $("#objectIds").trigger("change");
-    });
-
     $("#insertId").click(function(){
       $.each(selection, (function (index, value) {
         var qsid = value;
@@ -171,8 +134,11 @@ $(document).ready(function(){
         }
       }
         //console.log(zoomId + ' is: ' + zoomGuid);
-
+        $('#QSZOOM').empty();
       app.getObject('QSZOOM', zoomGuid);
+      // dirty hack to force rerender
+      var height = Math.random()+90;
+        $('#modal-zoom').height(height+"%");
     });
 
     //var app = qlik.openApp('8c01277a-aae5-4f9c-94c7-b02de896fe7e', config);
