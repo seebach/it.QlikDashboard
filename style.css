@@ -25,14 +25,19 @@
 .qs-box {
   background-color: white;
 }
-.row  {
-  height: 48%;
+.qs-box-wrapper  {
+  height: calc(100vh / 4);
+/*  height: 48%;
   width: 98%;
   clear:both;
+  */
+}
+.qs-box-fliter {
+  height: calc(100vh / 6);
 }
 .selectedIcon {
   background: grey;
-  opacity: 0.5;  
+  opacity: 0.5;
   display: none;
   position: absolute;
   top: 0;
@@ -50,7 +55,7 @@
   border:1px solid black;
   height: 60vh;
   width: 80vw;
-  overflow: scroll;R
+  overflow: scroll;
 }
 
 #QSZOOM {

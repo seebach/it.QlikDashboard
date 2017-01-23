@@ -32,24 +32,26 @@
 <pre>partial done: zoom modal, preview object, easy navigate qs object arrows forward backwards <br>
 Some css issues where the proper size isn't recognized</pre>-->
 <div class="container">
-  <div class="row">
-    <div class="col-sm-4" >
-      <div id="QV1" class="qs-box">QS1</div>
-      <button type="button" class="btn btn-info btn-sm zoombtn" data-toggle="modal" data-target="#modal-zoom">zoom</button>
-      <button type="button" class="btn btn-info btn-sm removebtn" >x</button>
+  <div class="col-xs-9">
+    <div class="box box-container" >
+      <div class="row header">
+          <h1>Visualizations</h1>
+      </div>
+    <div class="row row-eq-height">
+      <div id="last" class="col-lg-4 col-md-3 col-sm-2 col-xs-1">
+        <a id="addRow" class="btn btn-default pull-left">Add Element</a>
+      </div>
     </div>
-    <div class="col-sm-4">
-      <div id="QV2" class="qs-box">QS2</div>
-      <button type="button" class="btn btn-info btn-sm zoombtn" data-toggle="modal" data-target="#modal-zoom">zoom</button>
-      <button type="button" class="btn btn-info btn-sm removebtn" >x</button>
+  </div>
+</div>
+  <div class="col-xs-2">
+    <div class="box box-container" >
+      <div class="row header">
+          <h1>Filters</h1>
+      </div>
+    <div class="row" >
+      <div class="row" id="filters" ></div>
     </div>
-    <div class="col-sm-4">
-      <div id="QV3" class="qs-box">QS3</div>
-      <button type="button" class="btn btn-info btn-sm zoombtn" data-toggle="modal" data-target="#modal-zoom">zoom</button>
-      <button type="button" class="btn btn-info btn-sm removebtn" >x</button>
-    </div>
-    <div id="last" class="col-sm-4">
-      <a id="addRow" class="btn btn-default pull-left">Add Element</a>
     </div>
   </div>
 </div>
