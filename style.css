@@ -1,39 +1,61 @@
-.col-sm-4 {
-  height: 250px;
-  width: 250px;
-  border: 1px solid grey;
-  background-color: lightgrey;
+body {
+  overflow-y: auto;R
+}
+.removebtn-ui {
+  padding: 0px;
+  position: absolute;
+  color:#888;
+  font-size: 1.5em;
+  top: 2;
+  right: 2;
+  height:20px;
+  width:20px;
+  z-index: 20;
+  cursor: pointer;
+  cursor: hand;
+}
+.removebtn-ui:hover{
+   color:	#8B0000;
+}
+.zoombtn {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height:100%;
+  width:100%;
+  z-index: 10;
+  cursor: pointer;
+  cursor: hand;
+}
+.zoombtn:hover {
+  background-color: #EEE;
+  opacity: 0.3;
+}
+.qs-box {
+/*   max-height: calc(100vh / 3.3); */
+  height:calc(100vh / 3.3);;
+  background-color: white;
+  display: block;
+}
+.qs-box-wrapper  {
+  max-height: calc(100vh / 3);
+  max-width: 400px /* calc(100vw / 4) */;
+  min-height: 250px;
+  min-width: 300px;
+/*  box-shadow: 3px 3px 3px #EEE; */
+border:2px solid #dadada;
+ border-radius:7px;
+ box-shadow:0 0 10px #dadada;
+
   padding: 10px;
   margin-left: 10px;
   margin-bottom: 20px;
 }
-.col-sm-4 div:first-child {
-  margin-top: 5px;
-}
-.removebtn {
-  padding: 2px;
-  position: absolute;
-  top: 0;
-  right: 0;
-}
-.zoombtn {
-  padding: 2px;
-  position: absolute;
-  top: 0;
-  right: 20;
-}
-.qs-box {
-  background-color: white;
-}
-.qs-box-wrapper  {
-  height: calc(100vh / 4);
-/*  height: 48%;
-  width: 98%;
-  clear:both;
-  */
-}
-.qs-box-fliter {
+.qs-box-filter {
+  margin-top:2px;
   height: calc(100vh / 6);
+  min-width: 200px;
+  max-width: 35R0px;
 }
 .selectedIcon {
   background: grey;
@@ -46,20 +68,45 @@
   width: 100%;
   z-index:100;
 }
+.preview-wrapper {
+  height: calc(100vh / 6);
+  min-width: 250px;
+  max-width: 350px;
+}
+
 #modal-content .modal-dialog {
 }
 #modal-content .modal-content {
   height:90vh;
 }
+
 #QSPreview {
-  border:1px solid black;
+/*  border:1px solid black; */
   height: 60vh;
-  width: 80vw;
   overflow: scroll;
 }
 
 #QSZOOM {
   border: 1p solid black;
   height: 60%;
-  width: 60%;
+  /* width: 60%; */
+}
+#addRow {
+  color:#888;
+  font-size: 10.2em;
+  cursor: pointer;
+  cursor: hand;
+  text-align: center;
+  vertical-align: middle;
+  line-height:calc(100vh / 3);
+/* height:calc(100vh / 3); */
+/*  background-image: url("/resources/it.QlikDashboard/plus-icon.png")    ; */
+}
+#addRow:hover{
+   color:#666;
+}
+#filters {
+  border:2px solid #dadada;
+   border-radius:7px;
+   box-shadow:0 0 10px #dadada;
 }
