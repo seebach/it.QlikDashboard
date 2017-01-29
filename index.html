@@ -25,7 +25,7 @@
 
 <div class="jumbotron text-center">
   <div class="container"><h2>My Dashboard</h2>
-<!--  <br><a href="http://qs.itellidemo.dk/sense/app/8a37afbb-5c24-4da6-9f9a-93d3a86c108f" target="_blank">Open analysis</a> -->
+<!--  <br><a href="http://qs.itellidemo.dk/sense/app/8a37afbb-5c24-4da6-9f9a-93d3a86c108f" target="_blank">Open analysis</a> -->R
 </div>
 </div>
 <!--
@@ -71,25 +71,17 @@ Some css issues where the proper size isn't recognized</pre>-->
                 <h3>Select object</h3>
             </div>
             <div class="modal-body">
-                <p>
-                    <select id="Sheets" >
-                      <option value="null">Choose a collection of charts</option>
-                  </select>
-  <!--                <select id="SheetObjectIds" >
-                  </select>
--->                </p>
-<!--                <p>
-                    <input type="text" id="objectId" value="admCvFH" /> -->
-<!--                  <select id="objectIds" >
-                  </select>
-                  <button type="button" id="select-prev" class="btn btn-info btn-sm" >previous</button>
-                  <button type="button" id="select-next" class="btn btn-info btn-sm" >next</button>
-               </p>
--->                 <div  id="QSPreview">
-                </div>
 
-            </div>
+
+        <div class="row">
+            <div  id="QSPreview"></div>
+        </div>
+      </div>
+
             <div class="modal-footer">
+              <select id="Sheets" >
+                <option value="null">Choose a collection of charts</option>
+            </select>
                 <a id="dismiss" class="btn" data-dismiss="modal">Cancel</a>
                  <a id="insertId" class="btn btn-primary" data-dismiss="modal">Add to Dashboard</a>
             </div>

@@ -110,14 +110,51 @@ require( ["js/qlik"], function ( qlik ) {
     $('#QSPreview').empty();
     //var html = '<div class="col-sm-4">';
     $('#SheetObjectIds option').remove();
-    //console.log(this.value);
-//      if(this.value != 'null') {
-      /* replace with foreach later */
-///----
+
     //console.log($( "#Sheets option:selected" ).data("sheetGuid")) ;
     var sheetGuid = $( "#Sheets option:selected" ).data("sheetGuid");
     var i = 0;
-  //   console.log(SheetObjects);
+    var colSize = 100 / 24;
+    var rowSize = 100 / 12;
+
+  app.getObject(sheetGuid).then(function(model) {
+		model.layout.cells.map(function(d) {
+			return {
+				id: d.name,
+				top: d.row * rowSize,
+				left: d.col * colSize,
+				width: d.colspan * colSize,
+				height: d.rowspan * rowSize
+			}
+		})
+		.forEach(function(d) {
+      $('#QSPreview').append('<div class="preview-wrapper" id="preview-' + d.id + '" ><span id="select-'+d.id+'" class="ui-icon ui-icon-check selectedIcon" ></span><div id="show-'+d.id+'" ></div></div>');
+      $('#preview-' + d.id).css({
+				top: 'calc(' + d.top + '%)',
+				left: 'calc(' + d.left  + '%)',
+				width: 'calc(' + d.width + '%)',
+				height: 'calc(' + d.height + '%)',
+				position: 'absolute'
+			})
+      /*
+			$('<div id="preview-' + d.id + '" class="preview-wrapper" />').css({
+				top: 'calc(' + d.top + '%)',
+				left: 'calc(' + d.left  + '%)',
+				width: 'calc(' + d.width + '%)',
+				height: 'calc(' + d.height + '%)',
+				position: 'absolute'
+			}).appendTo('#QSPreview');
+*/
+      app.getObject('show-'+d.id,d.id,{"noInteraction": true,"noSelections": true});
+      $( "#preview-"+d.id ).click(function() {
+        selectObject ($(this).attr('id').replace('preview-',''))
+        $('#select-' + d.id).toggle();
+        $('#select-' + d.id).toggleClass( "selected" );
+      });
+		})
+	});
+
+  /*
     app.getObjectProperties(sheetGuid).then(function(model){
        console.log(model);
      });
@@ -145,7 +182,7 @@ require( ["js/qlik"], function ( qlik ) {
           $("#select-"+guid).toggle();
         }
         i++;
-      }  }
+      }  } */
     ;
   });
 

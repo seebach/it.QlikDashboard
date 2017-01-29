@@ -14,7 +14,7 @@ body {
   cursor: pointer;
   cursor: hand;
 }
-.removebtn-ui:hover{
+.removebtn-:hover{
    color:	#8B0000;
 }
 .zoombtn {
@@ -58,20 +58,24 @@ border:2px solid #dadada;
   max-width: 35R0px;
 }
 .selectedIcon {
-  background: grey;
-  opacity: 0.5;
-  display: none;
   position: absolute;
   top: 0;
   right: 0;
   height: 100%;
   width: 100%;
   z-index:100;
+  font-size: 1.3em;
+}
+.selectedIcon:hover {
+  background-color: grey;
+  opacity: 0.5;
+}
+.selected {
+  background-color: grey;
+  opacity: 0.5;
 }
 .preview-wrapper {
-  height: calc(100vh / 6);
-  min-width: 250px;
-  max-width: 350px;
+
 }
 
 #modal-content .modal-dialog {
