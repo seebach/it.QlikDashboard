@@ -78,22 +78,21 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">×</button>
-                    <h3>Select object</h3>
+                    <h3>Select Charts</h3>
                 </div>
-                <div class="modal-body">
-
-
-                    <div class="row">
-                        <div id="QSPreview"></div>
-                    </div>
+                <div class="modal-body container">
+                      <div class="container-fluid " id="qs-sheet-container">
+                        <div  id="qs-sheet-overview" class="row"> </div>
+                      </div>
+                <div class="row">  <div id="qs-sheet-view"  style="display:none"></div></div>
                 </div>
 
                 <div class="modal-footer">
-                    <select id="Sheets">
-  <option value="null">Choose a collection of charts</option>
-  </select>
+                  <a id="prevSheet" class="btn btn-primary float-left" title="Previous page"> < </a>
+                  <a id="qs-sheet-show-overview" class="btn btn-primary float-left" > Overview </a>
+                  <a id="nextSheet" class="btn btn-primary float-left" title="Next page"> > </a>
                     <a id="dismiss" class="btn" data-dismiss="modal">Cancel</a>
-                    <a id="insertId" class="btn btn-primary" data-dismiss="modal">Add to Dashboard</a>
+                    <a id="insertId" class="btn btn-primary disabled" data-dismiss="modal">Add to Dashboard</a>
                 </div>
             </div>
         </div>

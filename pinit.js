@@ -1,6 +1,17 @@
+/*
+fix stored sort order
+http://stackoverflow.com/questions/2669130/jquery-ui-sortable-determining-in-what-order-the-items-are
+
+fix how sheet are selected
+*/
+
 var app = {};
 // array to keep all elements to in saved in
 var DBitems = [];
+//keeps list of sheets in app
+var sheetList = [];
+// keeps track of the sheet we have navigated to
+var sheetCounter = 0;
 
 $(document).ready(function() {
 
@@ -26,42 +37,48 @@ $(document).ready(function() {
         $(function() {
             $("#sortable").sortable();
             $("#sortable").disableSelection();
+            $("#sortable").on("sortupdate", function(event, ui) {
+                // store new sort order
+                console.log($('#sortable').sortable('toArray'));
+
+                updateObjects();
+                //              console.log($('#sortable').sortable('toArray'));
+
+            });
+
         });
+
 
         var objectCounter = 0;
 
         // keep all object in app here
         var SheetObjects = [];
 
-        $("#addRow").click(function() {
-            $('#modal-content').modal('show');
-            $("#objectIds").trigger("change");
-        });
 
         $('#SheetObjectIds').on('change', function() {
             //console.log('Change to ' + this.value);
-            app.getObject('QSPreview', this.value);
+            app.getObject('qs-sheet-view', this.value);
         })
 
-        function makeGridBox(elementid,qsid) {
-            var html = '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 qs-box-wrapper"><div class="qs-box-inner"';
+        function makeGridBox(elementid, qsid) {
+            var html = '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 qs-box-wrapper qs-objectlist"  data-qsid="' + qsid + '" id="qs-container-' + qsid + '"><div class="qs-box-inner"';
             html += '<div id="' + elementid + '" class="qs-box">' + elementid + '</div>';
-            html += '<div class="zoombtn" data-qsid="' + qsid + '" data-toggle="modal" data-target="#modal-zoom"></div>';
-            html += '<div  class="dragbtn glyphicon glyphicon-move"  Title="Click to change postion"  ></div>';
-            html += '<div  class="glyphicon glyphicon-remove removebtn removebtn-ui"  Title="Remove chart" ></div>';
+            html += '<div class="zoombtn" data-qsid="' + qsid + '" data-toggle="modal" data-target="#modal-zoom" Title="Click for fullsize"></div>';
+            html += '<div  class="dragbtn glyphicon glyphicon-move"  Title="Click and drag to change postion"  ></div>';
+            html += '<div  class="glyphicon glyphicon-remove removebtn removebtn-ui" data-qsid="' + qsid + '" Title="Remove chart" ></div>';
             html += '</div></div>';
             return html;
         }
 
-        function makeFilterBox(elementid) {
-            var html = '<div class="qs-box-filter"><div>';
+        function makeFilterBox(elementid, qsid) {
+            var html = '<div class="qs-box-filter qs-objectlist" data-qsid="' + qsid + '" id="qs-container-' + qsid + '"><div>';
             html += '<div id="' + elementid + '" class="">' + elementid + '</div>';
-            html += '<div  class="glyphicon glyphicon-remove removebtn-filter" Title="Remove Filter" ></div>';
+            html += '<div  class="glyphicon glyphicon-remove removebtn removebtn-filter" data-qsid="' + qsid + '"  Title="Remove Filter" ></div>';
             html += '</div></div>';
             return html;
         }
 
-        function insertQlikObj(lastid, qsid, options) {
+        function insertQlikObj(lastid, qsid, saveToStorage, options) {
             log("insert: " + qsid);
             var elementid = 'QV' + objectCounter;
             var type;
@@ -76,58 +93,45 @@ $(document).ready(function() {
                 // handle filters differently
                 if (type === 'filterpane') {
                     app.getObject(elementid, qsid, '');
-                    var html = makeFilterBox(elementid);
+                    var html = makeFilterBox(elementid, qsid);
                     $('#filters').before(html);
                 } else {
                     app.getObject(elementid, qsid, options);
-                    var html = makeGridBox(elementid,qsid);
+                    var html = makeGridBox(elementid, qsid);
                     $(lastid).before(html);
                 }
-                addObjects(elementid, qsid);
             });
             objectCounter++;
+            if (saveToStorage === true) {
+                updateObjects()
+            };
         }
 
         $("#insertId").click(function() {
             $.each(selection, (function(index, value) {
                 var qsid = value;
-                insertQlikObj('#addRow', qsid, {
+                insertQlikObj('#addRow', qsid, true, {
                     "noInteraction": true,
                     "noSelections": true
                 });
             }));
 
             // reset the selections array
-            $('#QSPreview').empty();
+            $('#qs-sheet-view').empty();
             selection = [];
             //$('#Sheets').find('selected').remove()
             $('#Sheets').prop('selectedIndex', -1);
         });
 
         $(document).on('click', ".removebtn", function() {
-            $(this).parent().remove();
-            var removeId = $(this).parent()[0].children[0].id;
-            console.log($(this).parent()[0].children[0].id);
-            removeObjects(removeId);
-            //console.log(DBitems);
+            $('#qs-container-' + $(this).data('qsid')).remove();
         });
-        $(document).on('click', ".removebtn-filter", function() {
-            $(this).parent().remove();
-            var removeId = $(this).parent()[0].children[0].id;
-            console.log($(this).parent());
-            removeObjects(removeId);
-            //console.log(DBitems);
-        });
+
         // array for selected guid
         var selection = [];
-        $(document).on('change', "#Sheets", function() {
-            // Clear select first...
-            $('#QSPreview').empty();
-            //var html = '<div class="col-sm-4">';
-            $('#SheetObjectIds option').remove();
 
-            //console.log($( "#Sheets option:selected" ).data("sheetGuid")) ;
-            var sheetGuid = $("#Sheets option:selected").data("sheetGuid");
+        function showSheetObjects(sheetGuid) {
+            //    var sheetGuid = $("#Sheets option:selected").data("sheetGuid");
             var i = 0;
             var colSize = 100 / 24;
             var rowSize = 100 / 12;
@@ -143,8 +147,7 @@ $(document).ready(function() {
                         }
                     })
                     .forEach(function(d) {
-                        console.log(d);
-                        $('#QSPreview').append('<div class="preview-wrapper" id="preview-' + d.id + '" ><span id="select-' + d.id + '" class="ui-icon ui-icon-check selectedIcon" ></span><div id="show-' + d.id + '" ></div></div>');
+                        $('#qs-sheet-view').append('<div class="preview-wrapper" id="preview-' + d.id + '" ><span id="select-' + d.id + '" class="glyphicon glyphicon-ok selectedIcon" ></span><div id="show-' + d.id + '" ></div></div>');
                         $('#preview-' + d.id).css({
                             top: 'calc(' + d.top + '%)',
                             left: 'calc(' + d.left + '%)',
@@ -152,15 +155,7 @@ $(document).ready(function() {
                             height: 'calc(' + d.height + '%)',
                             position: 'absolute'
                         })
-                        /*
-			$('<div id="preview-' + d.id + '" class="preview-wrapper" />').css({
-				top: 'calc(' + d.top + '%)',
-				left: 'calc(' + d.left  + '%)',
-				width: 'calc(' + d.width + '%)',
-				height: 'calc(' + d.height + '%)',
-				position: 'absolute'
-			}).appendTo('#QSPreview');
-*/
+
                         app.getObject('show-' + d.id, d.id, {
                             "noInteraction": true,
                             "noSelections": true
@@ -170,9 +165,13 @@ $(document).ready(function() {
                             $('#select-' + d.id).toggle();
                             $('#select-' + d.id).toggleClass("selected");
                         });
+                        if (selection.indexOf( d.id)!=-1) {
+                          $('#select-' + d.id).show();
+                          $('#select-' + d.id).addClass("selected");
+                        }
                     })
-            });;
-        });
+            });
+        }
 
         function selectObject(addGuid) {
             var index = selection.indexOf(addGuid);
@@ -183,33 +182,86 @@ $(document).ready(function() {
                 selection.push(addGuid);
             }
             $("#select-" + addGuid).toggle();
+            if(selection.length<1) {
+              $("#insertId").toggleClass('disabled','remove');
+            } else {
+              $("#insertId").toggleClass('disabled','add');
+            }
             console.log(selection);
         }
+
 
 
         $(document).on('click', ".zoombtn", function() {
             // console.log($(this).parent()[0].children[0].id);
             var qsid = $(this).data('qsid');
             console.log(qsid);
-            app.getObjectProperties(qsid).then(function(model){
-              $('#zoom-modal-title').html(model.properties.title);
+            app.getObjectProperties(qsid).then(function(model) {
+                $('#zoom-modal-title').html(model.properties.title);
             });
 
             $('#QSZOOM').empty();
             app.getObject('QSZOOM', qsid);
             // dirty hack to force rerender
-            var height = ((Math.random() - 0.5) * 2)+ $('#QSZOOM').height();
+            var height = ((Math.random() - 0.5) * 2) + $('#QSZOOM').height();
 
             console.log(height);
             $('#QSZOOM').height(height + "%");
         });
 
+        function toogleSheetNavigation (state) {
+          $("#nextSheet").toggleClass('disabled',state);
+          $("#prevSheet").toggleClass('disabled',state);
+          $("#qs-sheet-show-overview").toggleClass('disabled',state);
+        }
+
+        $(document).on('click', "#addRow", function() {
+            $('#modal-content').modal('show');
+            $("#objectIds").trigger("change");
+            toogleSheetNavigation('remove');
+        });
+        $(document).on('click', ".qs-sheet-preview", function() {
+            var sheetGuid = $(this).data('sheet-guid');
+            sheetCounter = $(this).data('sheet-number');
+              console.log(sheetCounter);
+            showSheetObjects(sheetGuid);
+            $("#qs-sheet-overview").hide();
+            $("#qs-sheet-view").show();
+            toogleSheetNavigation('add');
+        });
+        $(document).on('click', "#qs-sheet-show-overview", function() {
+            $("#qs-sheet-overview").show();
+            $("#qs-sheet-view").hide();
+            toogleSheetNavigation('remove');
+            sheetCounter = 0;
+        });
+            $(document).on('click', "#nextSheet", function() {
+            sheetCounter = sheetCounter + 1; // increase i by one
+            sheetCounter = sheetCounter % sheetList.length; // if we've gone too high, start from `0` again
+            $('#qs-sheet-view').html('');
+            console.log(sheetCounter);
+            showSheetObjects( sheetList[sheetCounter]); // give us back the item of where we are now
+        });
+
+            $(document).on('click', "#prevSheet", function() {
+            if (sheetCounter === 0) { // i would become 0
+                sheetCounter = sheetList.length; // so put it at the other end of the array
+            }
+            sheetCounter = sheetCounter - 1; // decrease by one
+              $('#qs-sheet-view').html('');
+              console.log(sheetCounter);
+            showSheetObjects( sheetList[sheetCounter]); // give us back the item of where we are now
+        });
         //var app = qlik.openApp('8c01277a-aae5-4f9c-94c7-b02de896fe7e', config);
         var app = qlik.openApp('8dd051e5-78d3-4347-98ba-3c03c5c1aa28', config);
 
-        app.getAppObjectList('sheet', function(reply) {
+        app.getList('sheet', function(reply) {
+            count = 0;
             $.each(reply.qAppObjectList.qItems, function(key, sheet) {
-                $("#Sheets").append($('<option></option>').val(sheet.qMeta.title).attr('data-sheet-guid', sheet.qInfo.qId).html(sheet.qMeta.title));
+
+                // $("#Sheets").append($('<option></option>').val(sheet.qMeta.title).attr('data-sheet-guid', sheet.qInfo.qId).html(sheet.qMeta.title));
+                $("#qs-sheet-overview").append('<div class="col-xs-6 col-sm-6 col-md-4 col-lg-3 qs-sheet-preview" data-sheet-guid="' + sheet.qInfo.qId + '"  data-sheet-number="' + count + '" >' + sheet.qMeta.title + '<br/><i>' + sheet.qMeta.description + '</i></div>');
+                sheetList.push(sheet.qInfo.qId);
                 $.each(sheet.qData.cells, function(index, value) {
                     if ('type' in value) {
                         SheetObjects.push({
@@ -220,6 +272,7 @@ $(document).ready(function() {
                         });
                     }
                 });
+                count++;
             });
         });
         if (localStorage.getItem('defaultObjects').length >= 3) {
@@ -230,7 +283,7 @@ $(document).ready(function() {
             var defaultObjects = ['UgtPjHC', 'jUbp', 'dgXswmw', '30428be5-4dbd-451e-8a59-137a4bd6c5e0', '3c6300ca-b471-4b79-8e0d-b601b23b1678', '8bcff869-0a14-4e56-8448-ad1611cc2e66', '3491b46e-9ec4-48c6-a74c-b919cd78d835', '0ba3a6e1-2bd1-4170-9e2a-a3d80f03ff56', '156100bb-c7bc-4d47-a7ad-6cf4cf83515e'];
         }
         for (qid of defaultObjects) {
-            insertQlikObj('#addRow', qid, {
+            insertQlikObj('#addRow', qid, false, {
                 "noInteraction": true,
                 "noSelections": true
             });
@@ -267,29 +320,16 @@ function log(message) {
     console.log(message);
 }
 
-function addObjects(elementid, qsid) {
-    DBitems.push({
-        'qs': elementid,
-        'guid': qsid
+function updateObjects() {
+    DBitems = [];
+    $('.qs-objectlist').each(function() {
+        DBitems.push($(this).data('qsid'));
     });
     setLocalStorage();
 }
 
-function removeObjects(removeId) {
-    for (var i = DBitems.length - 1; i >= 0; i--) {
-        if (DBitems[i].qs == removeId) {
-            DBitems.splice(i, 1);
-        }
-    }
-    setLocalStorage();
-}
-
 function setLocalStorage() {
-    var saveToStorage = [];
-    for (value of DBitems) {
-        saveToStorage.push(value.guid)
-    }
     //saveToStorage.push(DBitems.filter(function(value,index) { return value.guid;}));
-    // console.log(saveToStorage);
-    localStorage.setItem('defaultObjects', JSON.stringify(saveToStorage));
+    console.log(DBitems);
+    localStorage.setItem('defaultObjects', JSON.stringify(DBitems));
 }

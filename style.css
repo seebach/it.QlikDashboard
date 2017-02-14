@@ -110,25 +110,54 @@ body {
     height: 100%;
     width: 100%;
     z-index: 100;
-    font-size: 1.3em;
+    color: ;
+    font-size: 10.3em;
+    text-align:center;
+    opacity: 0;
+    overflow: hidden;
 }
 
 .selectedIcon:hover {
-    background-color: grey;
-    opacity: 0.5;
+    background-color: #888;
+    opacity: 0.3;
 }
 
 .selected {
-    background-color: grey;
+    background-color: #888;
     opacity: 0.5;
 }
 
-.preview-wrapper {}
+.preview-wrapper {
+  vertical-align: middle;
+}
 
 .qv-button {
     clear: both;
     width: 97%;
     margin: 3px;
+}
+.qs-sheet-container {
+  max-height: 60vh;
+  overflow-y: scroll;
+}
+.qs-sheet-preview {
+  height: 80px;
+  margin:2px;
+  border: 2px solid #dadada;
+  border-radius: 7px;
+  box-shadow: 0 0 10px #dadada;
+  overflow: hidden;
+/*  background-color:#888; */
+}
+.qs-sheet-preview:hover {
+  border: 2px solid #888;
+}
+#qs-sheet-view {
+  width:50%;
+}
+.modal-body {
+  width:100%;
+  overflow: scroll;
 }
 
 #modal-content .modal-dialog {}
@@ -137,10 +166,10 @@ body {
     height: 90vh;
 }
 
-#QSPreview {
+#qs-sheet-view {
     /*  border:1px solid black; */
     height: 60vh;
-    overflow: scroll;
+    /* overflow:none; */
 }
 
 #QSZOOM {
@@ -170,5 +199,7 @@ body {
     border-radius: 7px;
     box-shadow: 0 0 10px #dadada;
 }
-
+.float-left {
+  float: left;
+}
 #filters {}
