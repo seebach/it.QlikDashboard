@@ -80,13 +80,10 @@ $(document).ready(function() {
 
         function insertQlikObj(lastid, qsid, saveToStorage, options) {
             log("insert: " + qsid);
+            $(lastid).before('<div id="placeholder-'+qsid+'" />');
             var elementid = 'QV' + objectCounter;
             var type;
-            SheetObjects.filter(function(SheetObjects) {
-                if (SheetObjects.guid == qsid) {
-                    type = SheetObjects.type;
-                }
-            });
+
             app.getObjectProperties(qsid).then(function(model) {
                 console.log(model.properties.visualization);
                 type = model.properties.visualization;
@@ -95,10 +92,11 @@ $(document).ready(function() {
                     app.getObject(elementid, qsid, '');
                     var html = makeFilterBox(elementid, qsid);
                     $('#filters').before(html);
+                      $('#placeholder-'+qsid).remove();
                 } else {
                     app.getObject(elementid, qsid, options);
                     var html = makeGridBox(elementid, qsid);
-                    $(lastid).before(html);
+                    $('#placeholder-'+qsid).replaceWith(html);
                 }
             });
             objectCounter++;
@@ -203,10 +201,10 @@ $(document).ready(function() {
             $('#QSZOOM').empty();
             app.getObject('QSZOOM', qsid);
             // dirty hack to force rerender
-            var height = ((Math.random() - 0.5) * 2) + $('#QSZOOM').height();
-
-            console.log(height);
-            $('#QSZOOM').height(height + "%");
+            //var height = ((Math.random() - 0.5) * 2) + $('#QSZOOM').height();
+            log(qlik.resize(qsid));
+          //  console.log(height);
+          //  $('#QSZOOM').height(height + "%");
         });
 
         function toogleSheetNavigation (state) {
@@ -275,19 +273,14 @@ $(document).ready(function() {
                 count++;
             });
         });
-        if (localStorage.getItem('defaultObjects').length >= 3) {
-            log('read from storage');
-            var defaultObjects = JSON.parse(localStorage.getItem('defaultObjects'));
-        } else {
-            log('st defaults');
-            var defaultObjects = ['UgtPjHC', 'jUbp', 'dgXswmw', '30428be5-4dbd-451e-8a59-137a4bd6c5e0', '3c6300ca-b471-4b79-8e0d-b601b23b1678', '8bcff869-0a14-4e56-8448-ad1611cc2e66', '3491b46e-9ec4-48c6-a74c-b919cd78d835', '0ba3a6e1-2bd1-4170-9e2a-a3d80f03ff56', '156100bb-c7bc-4d47-a7ad-6cf4cf83515e'];
-        }
-        for (qid of defaultObjects) {
-            insertQlikObj('#addRow', qid, false, {
-                "noInteraction": true,
-                "noSelections": true
-            });
-        }
+            $.getJSON("http://pcm.itellidemo.dk/api/api/User", function(data) {
+                  $.each(JSON.parse(data.QlikObjects),function(index,qid) {
+                    insertQlikObj('#addRow', qid, false, {
+                        "noInteraction": true,
+                        "noSelections": true
+                    });
+                  })
+              });
 
         // navigation buttons
         $("[data-qcmd]").on('click', function() {
@@ -326,8 +319,19 @@ function updateObjects() {
         DBitems.push($(this).data('qsid'));
     });
     setLocalStorage();
+    setUserApi();
 }
 
+function setUserApi() {
+  var data = JSON.stringify(DBitems);
+  $.post("http://pcm.itellidemo.dk/api/api/User",
+      {
+          QlikObjects: data
+      },
+      function(data, status){
+          log("Data: " + data + "\nStatus: " + status);
+      });
+}
 function setLocalStorage() {
     //saveToStorage.push(DBitems.filter(function(value,index) { return value.guid;}));
     console.log(DBitems);
