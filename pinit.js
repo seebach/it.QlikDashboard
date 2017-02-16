@@ -101,7 +101,7 @@ $(document).ready(function() {
             });
             objectCounter++;
             if (saveToStorage === true) {
-                updateObjects()
+                updateObjects();
             };
         }
 
@@ -123,6 +123,7 @@ $(document).ready(function() {
 
         $(document).on('click', ".removebtn", function() {
             $('#qs-container-' + $(this).data('qsid')).remove();
+            updateObjects();
         });
 
         // array for selected guid
@@ -180,10 +181,10 @@ $(document).ready(function() {
                 selection.push(addGuid);
             }
             $("#select-" + addGuid).toggle();
-            if(selection.length<1) {
-              $("#insertId").toggleClass('disabled','remove');
+            if(selection.length>0) {
+              $("#insertId").removeClass('disabled');
             } else {
-              $("#insertId").toggleClass('disabled','add');
+              $("#insertId").addClass('disabled');
             }
             console.log(selection);
         }
@@ -202,7 +203,13 @@ $(document).ready(function() {
             app.getObject('QSZOOM', qsid);
             // dirty hack to force rerender
             //var height = ((Math.random() - 0.5) * 2) + $('#QSZOOM').height();
-            log(qlik.resize(qsid));
+            qlik.resize();
+            $('#QSZOOM').show();
+            $('#QSZOOM').resize();
+            //app.visualization.get(qsid).resize();
+            app.visualization.get(qsid).then(function(object){
+          		object.resize();
+          	});
           //  console.log(height);
           //  $('#QSZOOM').height(height + "%");
         });
@@ -318,7 +325,7 @@ function updateObjects() {
     $('.qs-objectlist').each(function() {
         DBitems.push($(this).data('qsid'));
     });
-    setLocalStorage();
+    //setLocalStorage();
     setUserApi();
 }
 
